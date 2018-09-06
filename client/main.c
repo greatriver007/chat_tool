@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv)
 {
-	int udp_fd = udp_init(PORT);	//初始化UDP网络
+	int udp_fd = udp_init();	//初始化UDP网络
 
 	/* 消息收发线程 */
 	pthread_t udp_send_tid;

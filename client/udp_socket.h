@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-int udp_init(int port);				//初始化udp网络
+int udp_init();				//初始化udp网络
 
 void *udp_send_routine(void *arg);	//消息发送线程函数
 void *udp_recv_routine(void *arg);	//消息接受线程函数

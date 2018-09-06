@@ -10,20 +10,20 @@
 #include "udp_socket.h"
 #include "msg.h"
 
-static void list_online(int fd);
-static void chat(int fd);
-static void help();
+static void list_online(int fd);	//在线用户列表
+static void chat(int fd);			//聊天
+static void help();					//提示
 
-static struct sockaddr_in addr;	//	套接字地址
+static struct sockaddr_in addr;		//套接字地址
 
-void server_addr_init(struct sockaddr_in* addr) //初始化套接字地址
+static void server_addr_init(struct sockaddr_in* addr) //初始化套接字地址
 {
 	addr->sin_family = AF_INET;					
 	addr->sin_port = htons(PORT);				
 	addr->sin_addr.s_addr = htonl(INADDR_ANY);	
 }
 
-int udp_init(int port)
+int udp_init()
 {
 	/* 创建udp套接字 */
 	int fd = socket(PF_INET, SOCK_DGRAM, 0);	
@@ -104,6 +104,11 @@ void *udp_recv_routine(void *arg)	//消息接受线程函数
 		if (msg_len <= 0)
 		{
 			continue;
+		}
+		
+		if (strcmp(msg, "logout") == 0)
+		{
+			break;
 		}
 
 		printf("%s\n", msg);
