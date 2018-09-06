@@ -6,13 +6,7 @@ extern "C"
 #include <arpa/inet.h>
 }
 
-struct sockaddr_in;
-
-int create_udp_server_socket(sockaddr_in &addr);
-
-bool operator<(const sockaddr_in &lhs, const sockaddr_in &rhs);
-bool operator==(const sockaddr_in &lhs, const sockaddr_in &rhs);
-
-void udp_server_io(int fd, sockaddr_in &addr);
+int udp_server_init();			//初始化udp服务器
+void *udp_routine(void *arg);	//消息发送线程函数
 
 #endif
