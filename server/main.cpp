@@ -1,16 +1,4 @@
-/*#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <set>
-
-#include "def.h"*/
-#include "udp_server_socket.h"
-/*#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-*/
-using namespace std;
+#include "udp_server.h"
 
 int main()
 {

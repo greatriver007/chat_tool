@@ -1,0 +1,12 @@
+#ifndef MSG_H
+#define MSG_H
+
+#define PORT 6999
+
+#define MSG_VOID		0x00000000UL	
+#define MSG_ONLINE		0x00000001UL
+#define MSG_OFFLINE		0x00000002UL
+#define MSG_CHAT		0x00000004UL
+#define MSG_LIST		0x00000008UL
+
+#endif

@@ -1,5 +1,5 @@
-#include "udp_server_socket.h"
-#include "def.h"
+#include "udp_server.h"
+#include "msg.h"
 
 extern "C"
 {
@@ -95,14 +95,14 @@ void udp_server_io(int fd, sockaddr_in &addr)
 			(sockaddr*)(&client_addr), &client_addr_size);	
 
 		sscanf(msg, "%lu:%s", &msg_1, msg_2);
-
+	
 		if (msg_1 == MSG_ONLINE)
 		{	
 			/*广播上线通知*/
 			for (const auto &addr : addr_set)
 			{	
 				char msg_send[200];
-				sprintf(msg_send, "IP: %s at PORT %u online.\n",
+				sprintf(msg_send, "[IP: %s at PORT %u login]",
 					inet_ntop(AF_INET, &client_addr.sin_addr, ip, 
 						sizeof(ip)), ntohs(client_addr.sin_port));
 
@@ -120,7 +120,7 @@ void udp_server_io(int fd, sockaddr_in &addr)
 			for (const auto &addr : addr_set)
 			{	
 				char msg_send[200];
-				sprintf(msg_send, "IP: %s at PORT %u offline.\n",
+				sprintf(msg_send, "[IP: %s at PORT %u logout]",
 					inet_ntop(AF_INET, &client_addr.sin_addr, ip, 
 						sizeof(ip)), ntohs(client_addr.sin_port));
 
@@ -130,7 +130,50 @@ void udp_server_io(int fd, sockaddr_in &addr)
 		}
 		else if (msg_1 == MSG_CHAT)
 		{
-			printf("%s\n", msg_2);
+			int ip_num;
+			int port;
+			char content[200];
+
+			sscanf(msg_2, "%d:%d:%s", &ip_num, &port, content);
+			
+			sockaddr_in _addr;
+			_addr.sin_family = AF_INET;					
+			_addr.sin_port = htons(port);				
+			_addr.sin_addr.s_addr = ip_num;
+
+			char msg_send[200];
+			sprintf(msg_send, "[message from IP: %s at PORT %u]",
+				inet_ntop(AF_INET, &client_addr.sin_addr, ip, 
+					sizeof(ip)), ntohs(client_addr.sin_port));
+
+			sendto(fd, msg_send, strlen(msg_send), 0,
+					(const sockaddr*)&_addr, sizeof(_addr));
+
+			sendto(fd, content, strlen(content), 0,
+					(const sockaddr*)&_addr, sizeof(_addr));
+
+		}
+		else if (msg_1 == MSG_LIST)
+		{	
+			/*发送在线用户*/
+			char msg_send[200];
+			sprintf(msg_send, "[total %ld online]", addr_set.size() - 1);
+
+			sendto(fd, msg_send, strlen(msg_send), 0,
+				(const sockaddr*)&client_addr, sizeof(client_addr));
+
+			for (const auto &addr : addr_set)
+			{	
+				if (! (addr == client_addr))
+				{	
+					sprintf(msg_send, "[IP: %s at PORT %u]",
+						inet_ntop(AF_INET, &addr.sin_addr, ip, 
+							sizeof(ip)), ntohs(addr.sin_port));
+
+					sendto(fd, msg_send, strlen(msg_send), 0,
+						(const sockaddr*)&client_addr, sizeof(client_addr));
+				}
+			}
 		}
 
 		memset(msg, 0, sizeof(msg));

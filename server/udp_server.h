@@ -1,5 +1,5 @@
-#ifndef UDP_SERVER_SOCKET_H
-#define UDP_SERVER_SOCKET_H
+#ifndef UDP_SERVER_H
+#define UDP_SERVER_H
 
 extern "C"
 {
