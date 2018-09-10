@@ -107,7 +107,17 @@ void *udp_client_msg_recv_thread(void *arg)
 		/* 从UDP服务器接收消息 */
 		msg_len = recvfrom_udp_server(package, msg); 
 		
-		printf("%s\n", msg);
+		/* 解析命令 */
+		if (strncmp(msg, MSG_CHAT, MSG_LEN) == 0) 
+		{		
+			/* 显示收到的消息 */
+			printf("%s\n", msg + MSG_LEN);
+		}
+		if (strncmp(msg, MSG_LOGOUT, MSG_LEN) == 0) 
+		{		
+			/* 退出线程 */
+			break;
+		}
 	}
 	
 	return  NULL;
@@ -169,12 +179,15 @@ void start_chat(package_t* package, char* msg)
 	/* 输入对方端口号 */
 	printf("[输入对方端口号]\n");
 	scanf("%d", &port);	
+	getchar();
 	port = htons(port);
+
 	
 	while (1)
 	{
+		/* 输入要发送的内容 */
 		printf("[输入要发送的消息/输入quit结束聊天]\n");
-		scanf("%s", buf);	
+		my_gets(buf);
 		if (strcmp(buf, "quit") == 0)
 		{
 			printf("[聊天结束]\n");
@@ -182,6 +195,7 @@ void start_chat(package_t* package, char* msg)
 			break;
 		}
 		
+		/* 打包消息 */
 		sprintf(msg, "%s%d:%d:%s",  MSG_CHAT, ip, port, buf);
 		
 		sendto_udp_server(package, msg, strlen(msg)); // 发送消息

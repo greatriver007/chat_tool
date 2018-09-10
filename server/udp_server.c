@@ -2,7 +2,8 @@
 #include "addr_list.h"
 
 // 转发消息
-static void sendto_target_addr(package_t *package, 
+static void sendto_target_addr(package_t *package,
+				struct sockaddr_in *client_addr,
 				const char* msg, int msg_len);
 
 /*发送在线用户地址 */
@@ -81,7 +82,7 @@ void *udp_server_msg_repost_thread(void *arg)
 		if (strncmp(msg, MSG_CHAT, MSG_LEN) == 0) 
 		{		
 			/* 转发消息 */
-			sendto_target_addr(package, msg, msg_len);
+			sendto_target_addr(package, &client_addr, msg, msg_len);
 		}
 		else if (strncmp(msg, MSG_ONLINE, MSG_LEN) == 0) 
 		{
@@ -99,6 +100,10 @@ void *udp_server_msg_repost_thread(void *arg)
 			/* 用户下线 */
 			remove_from_list(addr_list, client_addr.sin_addr.s_addr, 
 								client_addr.sin_port);
+			/* 回复下线消息 */
+			sendto(package->udp_fd, msg, strlen(msg), 0, 
+					(struct sockaddr*)(&client_addr), 
+					client_addr_size);
 		}
 	}
 
@@ -109,13 +114,27 @@ void *udp_server_msg_repost_thread(void *arg)
 }
 
 // 转发消息
-void sendto_target_addr(package_t *package, const char* msg, int msg_len)
+void sendto_target_addr(package_t *package, 
+		struct sockaddr_in *client_addr,
+		const char* msg, int msg_len)
 {	
 	char buf[MAX_SIZE];
+	char ip_str[20];
 	int ip, port;
 	
-	strcpy(buf, MSG_CHAT);
-	sscanf(msg + MSG_LEN, "%d:%d:%s", &ip, &port, buf + MSG_LEN);
+	/* 设置要发送的内容 */
+	sprintf(buf, "%s[收到消息, 来自：IPv4地址: %s 端口号: %d]\n",
+			MSG_CHAT,
+			inet_ntop(AF_INET, &(client_addr->sin_addr), 
+					  ip_str, sizeof(ip_str)),
+			ntohs(client_addr->sin_port));
+
+	sscanf(msg + MSG_LEN, "%d:%d", &ip, &port);
+	const char* p_msg = msg + MSG_LEN;
+	while (*p_msg++ != ':');
+	while (*p_msg++ != ':');
+	
+	strcat(buf, p_msg);
 	
 	/* 设置目标地址 */
 	struct sockaddr_in target_addr;	
@@ -136,15 +155,29 @@ void send_online_addr(package_t *package,
 	char msg[MAX_SIZE];
 	
 	addr_t *p_addr = addr_list->next;
-	while (p_addr != NULL)
+	
+	if (p_addr != NULL && p_addr->next == NULL)
 	{
+		/* 设置要发送的内容 */
+		sprintf(msg, "%s[没有其他在线用户]", MSG_CHAT);
+		
+		/* 发送消息 */
+		sendto(package->udp_fd, msg, strlen(msg), 0, 
+					(struct sockaddr*)(client_addr), 
+					sizeof(struct sockaddr_in));
+		return;
+	}
+	
+	while (p_addr != NULL)
+	{			
 		/* 如果当前地址和收到消息的地址不同则发送在线用户地址 */
 		if (p_addr->ip != (client_addr->sin_addr).s_addr ||
 		    p_addr->port != client_addr->sin_port)
 		{
 			/* 设置要发送的内容 */
-			sprintf(msg, "[IPv4地址:%s 端口号:%d 在线]",
-					inet_ntop(AF_INET, &p_addr->ip, ip, sizeof(ip)),
+			sprintf(msg, "%s[IPv4地址:%s 端口号:%d 在线]",
+					MSG_CHAT,
+					inet_ntop(AF_INET, &(p_addr->ip), ip, sizeof(ip)),
 					ntohs(p_addr->port));
 							
 			/* 发送消息 */
