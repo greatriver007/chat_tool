@@ -1,12 +1,10 @@
-#ifndef UDP_SERVER_H
-#define UDP_SERVER_H
+#ifndef __UDP_SERVER_H__
+#define __UDP_SERVER_H__
 
-extern "C"
-{
-#include <arpa/inet.h>
-}
+#include "header.h"
 
-int udp_server_init();			//初始化udp服务器
-void *udp_routine(void *arg);	//消息发送线程函数
+extern int udp_server_init(package_t *package); // 初始化UDP客户端
+extern void *udp_server_msg_repost_thread(void * arg); // 消息转发线程函数
 
 #endif
+
