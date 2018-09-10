@@ -20,7 +20,7 @@ int udp_client_init(package_t *package)
 	/* 设置UDP套接字地址 */
 	(package->udp_addr).sin_family = AF_INET;			
 	(package->udp_addr).sin_port = htons(UDP_PORT);		
-	(package->udp_addr).sin_addr.s_addr = htonl(INADDR_ANY);
+	inet_pton(AF_INET, SERVER_IP, &(package->udp_addr).sin_addr);
 	
 	/* 创建UDP套接字 */
 	package->udp_fd = socket(PF_INET, SOCK_DGRAM, 0);	

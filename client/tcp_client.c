@@ -5,8 +5,8 @@ int tcp_client_init(package_t *package)
 {
 	/* 设置TCP套接字地址 */
 	(package->tcp_addr).sin_family = AF_INET;			
-	(package->tcp_addr).sin_port = htons(TCP_PORT);		
-	(package->tcp_addr).sin_addr.s_addr = htonl(INADDR_ANY);
+	(package->tcp_addr).sin_port = htons(TCP_PORT);	
+	inet_pton(AF_INET, SERVER_IP, &(package->udp_addr).sin_addr);	
 	
 	/* 创建TCP套接字 */
 	package->tcp_fd = socket(PF_INET, SOCK_STREAM, 0);	

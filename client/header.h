@@ -10,6 +10,8 @@
 #include <string.h>
 #include <pthread.h>
 
+#define SERVER_IP "192.168.0.106"
+
 #define UDP_PORT 6999
 #define TCP_PORT 6999
 
