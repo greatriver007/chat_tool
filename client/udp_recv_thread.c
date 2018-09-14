@@ -6,6 +6,7 @@ static void print_onlines(int ip, int port);
 /* 打印收到的消息 */
 static void printf_msg(int ip, int port, const char *msg);
 
+
 /* 数据接收线程 */
 void* udp_recv_thread(void *p_udp_fd)
 {	
@@ -37,6 +38,7 @@ void* udp_recv_thread(void *p_udp_fd)
 	return NULL;
 }
 
+
 /* 打印在线用户 */
 void print_onlines(int ip, int port)
 {
@@ -52,6 +54,7 @@ void print_onlines(int ip, int port)
 		   inet_ntop(AF_INET, &ip, ip_str, sizeof(ip_str)),
 		   ntohs(port));
 }
+
 
 /* 打印收到的消息 */
 void printf_msg(int ip, int port, const char *msg)
@@ -72,8 +75,7 @@ void printf_msg(int ip, int port, const char *msg)
 	printf("[收到消息! %d:%d:%d]\n"
 		   "[%s]\n"
 		   "[来自用户: IP:%s 端口:%d]\n",
-		   8 + pt->tm_hour,pt->tm_min, pt->tm_sec, 
-		   msg,
+		   8 + pt->tm_hour,pt->tm_min, pt->tm_sec, msg,
 		   inet_ntop(AF_INET, &ip, ip_str, sizeof(ip_str)),
 		   ntohs(port));
 }

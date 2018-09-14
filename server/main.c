@@ -2,7 +2,8 @@
 
 int main(int argc, char **argv)
 {
-	server_routine(); // 服务器例程
+	/* 服务器例程 */
+	server_routine();
 	
 	return 0;
 }

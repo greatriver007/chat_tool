@@ -75,7 +75,9 @@ int server_init(struct sockaddr_in* server_addr)
 	int server_fd = socket(AF_INET, SOCK_DGRAM, 0);	
 	if (server_fd < 0)
 	{
+#ifdef DEBUG
 		perror("server_init: 创建UDP套接字失败");
+#endif
 		exit(1);
 	}
 
@@ -89,7 +91,9 @@ int server_init(struct sockaddr_in* server_addr)
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, 
 			&opt, sizeof(opt)) != 0)
 	{
+#ifdef DEBUG
 		perror("server_init: 允许重用地址失败");
+#endif
 		close(server_fd);
 		exit(1);
 	}
@@ -98,7 +102,9 @@ int server_init(struct sockaddr_in* server_addr)
 	if (setsockopt(server_fd, SOL_SOCKET, SO_BROADCAST,
 			&opt, sizeof(opt)) != 0)
 	{
+#ifdef DEBUG
 		perror("server_init: 允许发送广播数据失败");
+#endif
 		close(server_fd);
 		exit(1);
 	}
@@ -107,7 +113,9 @@ int server_init(struct sockaddr_in* server_addr)
 	if (bind(server_fd, (struct sockaddr*)server_addr, 
 		sizeof(*server_addr)) != 0)
 	{
+#ifdef DEBUG
 		perror("server_init: 绑定套接字地址失败");
+#endif
 		close(server_fd);
 		exit(1);
 	}

@@ -13,7 +13,9 @@ int tcp_client_init()
 	int tcp_fd = socket(AF_INET, SOCK_STREAM, 0);	
 	if (tcp_fd < 0)
 	{
+#ifdef DEBUG
 		perror("tcp_client_init: 创建UDP套接字失败");
+#endif
 		exit(1);
 	}
 	
@@ -26,15 +28,19 @@ int tcp_client_init()
 	int opt = 1;
 	if (setsockopt(tcp_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
 	{
+#ifdef DEBUG
 		perror("tcp_client_init: 允许重用地址失败");
+#endif
 		close(tcp_fd);
 		exit(1);
 	}
 	
 	/* 绑定套接字地址 */
-	if (bind(tcp_fd, (struct sockaddr*)&(tcp_addr), sizeof(tcp_addr)) != 0)
+	if (bind(tcp_fd, (struct sockaddr*)&tcp_addr, sizeof(tcp_addr)) != 0)
 	{
+#ifdef DEBUG
 		perror("tcp_server_init: 绑定套接字地址失败");
+#endif
 		close(tcp_fd);
 		exit(1);
 	}
@@ -42,7 +48,9 @@ int tcp_client_init()
 	/* 最大监听数20 */
 	if (listen(tcp_fd, 20) == -1)
 	{
+#ifdef DEBUG
 		perror("tcp_server_init: 设置最大监听数失败");
+#endif
 		close(tcp_fd);
 		exit(1);
 	}

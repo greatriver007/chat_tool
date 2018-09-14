@@ -16,18 +16,25 @@ extern pthread_cond_t login_cond;
 
 /* 获取指令 */
 static int get_data_type();
+
 /* 登录 */
 static void login(int udp_fd, Net_packet* packet);
+
 /* 退出登录 */
 static void logout(int udp_fd, Net_packet* packet);
+
 /* 发送消息 */
 static void start_chat(int udp_fd, Net_packet* packet);
+
 /* 获取在线用户 */
 static void get_onlines(int udp_fd, Net_packet* packet);
+
 /* 显示帮助 */
 static void show_help();
+
 /* 获取用户输入 */
 static int get_msg(char *msg, int msg_len);
+
 
 /* 数据发送线程 */
 void* udp_send_thread(void *p_udp_fd)
@@ -72,6 +79,7 @@ void* udp_send_thread(void *p_udp_fd)
 	return NULL;
 }
 
+
 /* 获取指令 */
 int get_data_type()
 {
@@ -101,6 +109,7 @@ int get_data_type()
 	return -1;
 }
 
+
 /* 登录 */
 void login(int udp_fd, Net_packet* packet)
 {
@@ -129,12 +138,14 @@ void login(int udp_fd, Net_packet* packet)
 	show_help();
 }
 
+
 /* 退出登录 */
 void logout(int udp_fd, Net_packet* packet)
 {
 	packet->data_type = DATA_LOGOUT;
 	send_data(udp_fd, packet);	
 }
+
 
 /* 发送消息 */
 void start_chat(int udp_fd, Net_packet* packet)
@@ -172,6 +183,7 @@ void start_chat(int udp_fd, Net_packet* packet)
 	}
 }
 
+
 /* 获取在线用户 */
 void get_onlines(int udp_fd, Net_packet* packet)
 {
@@ -179,6 +191,7 @@ void get_onlines(int udp_fd, Net_packet* packet)
 	send_data(udp_fd, packet);
 	printf("1111\n");
 }
+
 
 /* 显示帮助 */
 void show_help()
@@ -189,6 +202,7 @@ void show_help()
 		   "[输入 help   获取帮助]\n"
 		   "[输入 logout 退出登录]\n");
 }
+
 
 /* 获取用户输入 */
 int get_msg(char *msg, int msg_len)

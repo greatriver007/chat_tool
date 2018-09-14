@@ -4,8 +4,12 @@
 extern int LOCAL_IP;
 extern int LOCAL_PORT;
 
-static void* file_recv_thread(void* arg); // 文件接收子线程函数
-static void recv_filename(int src_fd, char *filename); // 接收发送者和文件名函数
+/* 文件接收子线程函数 */
+static void* file_recv_thread(void* arg); 
+
+/* 接收发送者和文件名函数 */
+static void recv_filename(int src_fd, char *filename); 
+
 
 /* 文件接收线程 */
 void* tcp_recv_thread(void *p_tcp_fd)
@@ -36,7 +40,9 @@ void* tcp_recv_thread(void *p_tcp_fd)
 		*src_fd = accept(tcp_fd, (struct sockaddr*)&tcp_addr, &socklen);
 		if (*src_fd < 0)
 		{
+#ifdef DEBUG
 			perror("tcp_recv_thread: 等待连接失败");
+#endif
 			close(*src_fd);
 			return NULL;
 		}
@@ -48,6 +54,7 @@ void* tcp_recv_thread(void *p_tcp_fd)
 	
 	return NULL;
 }
+
 
 /* 文件接收子线程函数 */
 void* file_recv_thread(void* arg)
@@ -65,7 +72,9 @@ void* file_recv_thread(void* arg)
 	int fd = open(filename, O_WRONLY | O_CREAT, 0666);
 	if (fd < 0)
 	{
+#ifdef DEBUG
 		perror("file_recv_thread: 创建文件失败");
+#endif
 		return NULL;
 	}
 	
@@ -77,14 +86,14 @@ void* file_recv_thread(void* arg)
 		write(fd, buf, buf_len);
 	}
 	
-	/* 关闭文件 */
 	close(fd);
-	/* 关闭连接 */
 	close(src_fd);
 	
 	return NULL;
 }
 
+
+/* 接收发送者和文件名函数 */
 void recv_filename(int src_fd, char *filename)
 {
 	Net_packet packet;

@@ -15,8 +15,4 @@
 #include <string.h>
 #include <time.h>
 
-#define DEBUG
-#define Debug(msg) \
-	printf("FILE: %s, LINE: %d, MSG: %s\n", __FILE__, __LINE__, #msg)
-
 #endif

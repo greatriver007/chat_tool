@@ -11,9 +11,15 @@ extern pthread_cond_t chat_cond;
 pthread_mutex_t file_send_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t file_send_cond = PTHREAD_COND_INITIALIZER;
 
-static void* file_send_thread(void* arg);	// 文件发送子线程函数
-static int tcp_connect(); 					// 建立tcp连接
-static void get_path(char *path); 			// 读取要上传的文件路径
+/* 文件发送子线程函数 */
+static void* file_send_thread(void* arg);	
+
+/* 建立tcp连接 */
+static int tcp_connect(); 				
+	
+/* 读取要上传的文件路径 */
+static void get_path(char *path); 			
+
 
 /* 文件发送线程 */
 void* tcp_send_thread(void *tcp_fd)
@@ -29,10 +35,18 @@ void* tcp_send_thread(void *tcp_fd)
 		
 		/* 文件发送子线程函数 */
 		pthread_t file_send_tid;
-		pthread_create(&file_send_tid, NULL, file_send_thread, tcp_fd);
+		if (pthread_create(&file_send_tid, NULL, file_send_thread, tcp_fd) 
+			!= 0)
+		{
+#ifdef DEBUG
+			perror("tcp_send_thread: 创建文件发送子线程失败");
+#endif
+			return NULL;		
+		}	
 	}
 	return NULL;
 }
+
 
 /* 文件发送子线程函数 */
 void* file_send_thread(void* arg)
@@ -49,7 +63,9 @@ void* file_send_thread(void* arg)
 	int fd = open(path, O_RDONLY);
 	if (fd < 0)
 	{
+#ifdef DEBUG
 		perror("file_send_thread: 只读打开文件失败");
+#endif
 		pthread_cond_signal(&chat_cond); // 唤醒聊天线程
 		return NULL;
 	}
@@ -83,6 +99,7 @@ void* file_send_thread(void* arg)
 	return NULL;
 }
 
+
 /* 建立tcp连接 */
 int tcp_connect()
 {
@@ -109,7 +126,9 @@ int tcp_connect()
 	int dst_fd = socket(PF_INET, SOCK_STREAM, 0);
 	if (dst_fd < 0)
 	{
+#ifdef DEBUG
 		perror("file_send_thread: 创建TCP套接字失败");
+#endif
 		pthread_cond_signal(&chat_cond); // 唤醒聊天线程
 		return -1;
 	}
@@ -118,7 +137,9 @@ int tcp_connect()
 	if (connect(dst_fd, (struct sockaddr*)&(dst_addr), 
 				sizeof(dst_addr)) != 0)
 	{
+#ifdef DEBUG
 		perror("file_send_thread: 建立TCP连接失败");
+#endif
 		close(dst_fd);
 		pthread_cond_signal(&chat_cond); // 唤醒聊天线程
 		return -1;
@@ -126,6 +147,7 @@ int tcp_connect()
 	
 	return dst_fd;
 }
+
 
 /* 读取要上传的文件路径 */
 void get_path(char *path)

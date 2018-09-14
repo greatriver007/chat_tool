@@ -3,7 +3,15 @@
 
 #include "addr_list.h"
 
-addr_t* create_list() //创建链表
+/* 寻找结点 */
+static addr_t* find_in_list(addr_t *head, int ip, int port);
+
+/* 清除链表 */
+static void clear_list(addr_t *head);
+
+
+/* 创建链表 */
+addr_t* create_list() 
 {
 	addr_t *head = (addr_t*)malloc(sizeof(addr_t));
 	if(head == NULL)
@@ -17,7 +25,8 @@ addr_t* create_list() //创建链表
 	return head;
 }
 
-addr_t* find_in_list(addr_t *head, int ip, int port) //	寻找结点
+/* 寻找结点 */
+addr_t* find_in_list(addr_t *head, int ip, int port) 
 {
 	addr_t *p = head->next;
 
@@ -29,7 +38,9 @@ addr_t* find_in_list(addr_t *head, int ip, int port) //	寻找结点
 	return p;
 }
 
-void insert_to_list(addr_t *head, int ip, int port) //增加结点
+
+/* 增加结点 */
+void insert_to_list(addr_t *head, int ip, int port)
 {
 	if (find_in_list(head, ip, port) != NULL)
 	{
@@ -50,7 +61,9 @@ void insert_to_list(addr_t *head, int ip, int port) //增加结点
 	head->next = p_new;
 }
 
-void remove_from_list(addr_t *head, int ip, int port) //删除结点
+
+/* 删除结点 */
+void remove_from_list(addr_t *head, int ip, int port) 
 {
 	addr_t *p = head;
 
@@ -72,7 +85,9 @@ void remove_from_list(addr_t *head, int ip, int port) //删除结点
 	free(tmp);
 }
 
-void clear_list(addr_t *head) //清除链表
+
+/* 清除链表 */
+void clear_list(addr_t *head) 
 {
 	addr_t *p = head->next;
 
@@ -84,7 +99,8 @@ void clear_list(addr_t *head) //清除链表
 	}
 }
 
-void destroy_list(addr_t **p_head) //销毁链表
+/* 销毁链表 */
+void destroy_list(addr_t **p_head) 
 {
 	clear_list(*p_head);
 	free(*p_head);

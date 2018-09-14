@@ -9,7 +9,9 @@ int udp_client_init()
 	int udp_fd = socket(AF_INET, SOCK_DGRAM, 0);	
 	if (udp_fd < 0)
 	{
+#ifdef DEBUG
 		perror("udp_client_init: 创建UDP套接字失败");
+#endif
 		exit(1);
 	}
 	
@@ -22,7 +24,9 @@ int udp_client_init()
 	int opt = 1;
 	if (setsockopt(udp_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
 	{
+#ifdef DEBUG
 		perror("udp_client_init: 允许重用地址失败");
+#endif
 		close(udp_fd);
 		exit(0);
 	}
@@ -30,13 +34,16 @@ int udp_client_init()
 	/* 允许发送广播数据  */
 	if (setsockopt(udp_fd, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt)) != 0)
 	{
+#ifdef DEBUG
 		perror("udp_client_init: 允许发送广播数据失败");
+#endif
 		close(udp_fd);
 		exit(0);
 	}
 	
 	return udp_fd;
 }
+
 
 /* 数据接收函数 */
 void recv_data(int fd, Net_packet* packet)
