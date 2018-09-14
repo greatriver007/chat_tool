@@ -1,17 +1,15 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
-#define SERVER_IP "192.168.0.102"
-
-#define UDP_PORT 6999
-#define TCP_PORT 6999
+#define SERVER_IP	"192.168.0.102"
+#define SERVER_PORT	6999
 
 #define DATA_NONE	0x00
 #define DATA_ONLINE 0x01 
 #define DATA_CHAT	0x02
 #define DATA_LOGIN	0x04
 #define DATA_LOGOUT	0x08
-#define DATA_FILE 	0x10
+#define DATA_FILE	0x10
 
 #define MAX_DATA_SIZE 256
 

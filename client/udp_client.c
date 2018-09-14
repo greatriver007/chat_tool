@@ -15,7 +15,7 @@ int udp_client_init()
 	
 	/* 设置UDP套接字地址 */
 	udp_addr.sin_family = AF_INET;			
-	udp_addr.sin_port = htons(UDP_PORT);		
+	udp_addr.sin_port = htons(SERVER_PORT);		
 	inet_pton(AF_INET, SERVER_IP, &udp_addr.sin_addr);
 
 	/* 允许重用地址 */ 
@@ -56,7 +56,7 @@ void send_data(int fd, const Net_packet* packet)
 	/* 设置服务器地址 */
 	struct sockaddr_in addr;	
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(UDP_PORT);		
+	addr.sin_port = htons(SERVER_PORT);		
 	inet_pton(AF_INET, SERVER_IP, &addr.sin_addr);	
 		
 	/* 发送消息 */

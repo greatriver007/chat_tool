@@ -1,7 +1,18 @@
 #include "udp_client.h"
 
-/* 唤醒数据接收线程条件变量 */
-extern pthread_cond_t recv_thread_cond;
+/* 唤醒文件发送的条件变量 */
+extern pthread_cond_t file_send_cond;
+
+/* 等待文件发送操作结束的互斥量和条件变量 */
+pthread_mutex_t chat_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t chat_cond = PTHREAD_COND_INITIALIZER;
+
+/* 本地ip和端口号 */
+int LOCAL_IP = 0;
+int LOCAL_PORT = 0;
+
+/* 登录状态条件变量 */
+extern pthread_cond_t login_cond;
 
 /* 获取指令 */
 static int get_data_type();
@@ -27,8 +38,6 @@ void* udp_send_thread(void *p_udp_fd)
 	
 	login(udp_fd, &packet);	// 登录
 
-	show_help(); // 显示帮助
-	
 	while(1)
 	{
 		packet.data_type = get_data_type();	//获取指令
@@ -45,6 +54,16 @@ void* udp_send_thread(void *p_udp_fd)
 		case DATA_LOGOUT: // 退出登录
 			logout(udp_fd, &packet);
 			return NULL;
+		case DATA_FILE:
+		
+			pthread_cond_signal(&file_send_cond); //唤醒文件发送线程
+			
+			/* 等待文件发送操作接收 */
+			pthread_mutex_lock(&chat_mutex);
+			pthread_cond_wait(&chat_cond, &chat_mutex);	
+			pthread_mutex_unlock(&chat_mutex);	
+			
+			break;
 		default :
 			show_help();
 		}
@@ -75,7 +94,10 @@ int get_data_type()
 	{
 		return DATA_ONLINE;
 	}	
-
+	if (strcmp(cmd, "file") == 0)
+	{
+		return DATA_FILE;
+	}
 	return -1;
 }
 
@@ -85,13 +107,26 @@ void login(int udp_fd, Net_packet* packet)
 	packet->data_type = DATA_NONE;
 	send_data(udp_fd, packet);	
 	
+	/* 请求登录 */
 	packet->data_type = DATA_LOGIN;
-	send_data(udp_fd, packet);	//请求登录
+	send_data(udp_fd, packet);	
 	
-	recv_data(udp_fd, packet);	//接收回执
+	/* 接收回执 */
+	recv_data(udp_fd, packet);	
+	LOCAL_IP = packet->src_ip;
+	LOCAL_PORT = packet->src_port;
 	
-	/* 唤醒数据接收线程 */
-	pthread_cond_signal(&recv_thread_cond);
+	/* 登录成功 */
+	pthread_cond_signal(&login_cond);
+		
+	/* 打印本机用户地址 */
+	char ip_str[20];
+	printf("[本地用户: IP:%s 端口:%d]\n",
+		   inet_ntop(AF_INET, &LOCAL_IP, ip_str, sizeof(ip_str)),
+		   ntohs(LOCAL_PORT));
+	
+	/* 打印帮助 */
+	show_help();
 }
 
 /* 退出登录 */

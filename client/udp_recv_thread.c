@@ -1,10 +1,5 @@
 #include "udp_client.h"
 
-/* 唤醒数据接收线程互斥量 */
-pthread_mutex_t recv_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
-/* 唤醒数据接收线程条件变量 */
-pthread_cond_t recv_thread_cond = PTHREAD_COND_INITIALIZER;
-
 /* 打印在线用户 */
 static void print_onlines(int ip, int port);
  
@@ -14,18 +9,11 @@ static void printf_msg(int ip, int port, const char *msg);
 /* 数据接收线程 */
 void* udp_recv_thread(void *p_udp_fd)
 {	
-	/* 等待被唤醒 */
-	pthread_mutex_lock(&recv_thread_mutex);
-	pthread_cond_wait(&recv_thread_cond, &recv_thread_mutex);
-	pthread_mutex_unlock(&recv_thread_mutex);
-	
+	pthread_detach(pthread_self());	//设置分离属性
+
 	int udp_fd = *(int*)p_udp_fd;
 	
 	Net_packet packet;
-	
-	/* 设置服务器地址 */
-	packet.dst_port = htons(UDP_PORT);
-	inet_pton(AF_INET, SERVER_IP, &packet.dst_ip);
 
 	while(1)
 	{
@@ -41,8 +29,6 @@ void* udp_recv_thread(void *p_udp_fd)
 		case DATA_ONLINE: // 打印在线用户
 			print_onlines(packet.src_ip, packet.src_port);
 			break;
-		case DATA_LOGOUT: // 退出登录
-			return NULL;
 		default:
 			break;
 		}

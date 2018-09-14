@@ -81,7 +81,7 @@ int server_init(struct sockaddr_in* server_addr)
 
 	/* 设置UDP套接字地址 */
 	server_addr->sin_family = AF_INET;			
-	server_addr->sin_port = htons(UDP_PORT);		
+	server_addr->sin_port = htons(SERVER_PORT);		
 	(server_addr->sin_addr).s_addr = htonl(INADDR_ANY);
 	
 	/* 允许重用地址 */ 
@@ -175,14 +175,6 @@ void add_user(int server_fd, addr_t* addr_list,
 void remove_user(int server_fd, addr_t* addr_list,
 				 Net_packet* packet)
 {	
-	/* 设置目标地址 */
-	packet->dst_ip = packet->src_ip;
-	packet->dst_port = packet->src_port;
-	
-	/* 发送消息 */
-	send_data(server_fd, packet);
-	
-	/* 删除用户 */
 	remove_from_list(addr_list, packet->src_ip, packet->src_port);	
 }
 
