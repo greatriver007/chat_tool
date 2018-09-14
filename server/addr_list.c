@@ -9,6 +9,7 @@ addr_t* create_list() //创建链表
 	if(head == NULL)
 	{
 		perror("create_list: malloc");
+		exit(1);
 	}
 
 	head->next = NULL;
@@ -39,6 +40,7 @@ void insert_to_list(addr_t *head, int ip, int port) //增加结点
 	if(p_new == NULL)
 	{
 		perror("append_list: malloc");
+		exit(1);
 	}
 
 	p_new->ip = ip;
