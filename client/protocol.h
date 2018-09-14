@@ -10,6 +10,8 @@
 #define DATA_LOGIN	0x04
 #define DATA_LOGOUT	0x08
 #define DATA_FILE	0x10
+#define DATA_ACCEPT 0x20
+#define DATA_REFUSE 0x40
 
 #define MAX_DATA_SIZE 256
 
