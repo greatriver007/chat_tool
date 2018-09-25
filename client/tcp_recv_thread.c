@@ -116,7 +116,7 @@ void recv_filename(int src_fd, char *filename)
 		   packet.data,
 		   inet_ntop(AF_INET, &packet.src_ip, ip_str, sizeof(ip_str)),
 		   ntohs(packet.src_port));
-	  
+	/* 此处可以修改文件保存路径 */
 	stpcpy(filename, "./file/");
 	strcat(filename, packet.data);
 }
